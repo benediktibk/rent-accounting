@@ -10,6 +10,8 @@ struct Arguments {
     database_user: String,
     #[arg(long)]
     database_password: String,
+    #[arg(long)]
+    database_name: String,
 }
 
 fn main() {
@@ -17,10 +19,12 @@ fn main() {
     let database_server = arguments.database_server;
     let database_user = arguments.database_user;
     let database_password = arguments.database_password;
+    let database_name = arguments.database_name;
 
     println!("connecting to {database_server} with user {database_user}");
 
-    let connection_string = format!("host={database_server} user={database_user} password={database_password}");
+    let connection_string = format!("host={database_server} user={database_user} password={database_password} dbname={database_name}");
+    println!("{}", connection_string);
     let connect_result = Client::connect(&connection_string.to_owned(), NoTls);
 
     if !connect_result.is_ok() {
@@ -30,7 +34,7 @@ fn main() {
 
     let mut database_client = connect_result.unwrap();
 
-    let query_result = database_client.query("SELECT name FROM tenant", &[]);
+    let query_result = database_client.query("SELECT full_name FROM tenant", &[]);
 
     if !query_result.is_ok() {
         println!("query failed");
@@ -38,8 +42,8 @@ fn main() {
     }
 
     for row in query_result.unwrap() {
-        let name = row.get::<&str, &str>("name");
+        let full_name = row.get::<&str, &str>("full_name");
     
-        println!("tenant: {name}");
+        println!("tenant: {full_name}");
     }
 }
