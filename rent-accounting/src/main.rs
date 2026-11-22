@@ -21,5 +21,25 @@ fn main() {
     println!("connecting to {database_server} with user {database_user}");
 
     let connection_string = format!("host={database_server} user={database_user} password={database_password}");
-    let mut database_client = Client::connect(&connection_string.to_owned(), NoTls);
+    let connect_result = Client::connect(&connection_string.to_owned(), NoTls);
+
+    if !connect_result.is_ok() {
+        println!("database connection failed");
+        return;
+    }
+
+    let mut database_client = connect_result.unwrap();
+
+    let query_result = database_client.query("SELECT name FROM tenant", &[]);
+
+    if !query_result.is_ok() {
+        println!("query failed");
+        return;
+    }
+
+    for row in query_result.unwrap() {
+        let name = row.get::<&str, &str>("name");
+    
+        println!("tenant: {name}");
+    }
 }
