@@ -24,7 +24,6 @@ fn main() {
     println!("connecting to {database_server} with user {database_user}");
 
     let connection_string = format!("host={database_server} user={database_user} password={database_password} dbname={database_name}");
-    println!("{}", connection_string);
     let connect_result = Client::connect(&connection_string.to_owned(), NoTls);
 
     if !connect_result.is_ok() {
